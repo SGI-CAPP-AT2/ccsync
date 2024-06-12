@@ -15,10 +15,11 @@ import { toast } from "react-toastify";
 import { Badge } from "@/components/ui/badge"
 import { FaInfo } from "react-icons/fa6";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
-import { ArrowUpDown, Trash2Icon } from "lucide-react"
+import { ArrowUpDown, Plus, Trash2Icon } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { parseISO, format } from 'date-fns';
+import { AiOutlineSync } from "react-icons/ai";
 
 type Props = {
     email: string;
@@ -380,7 +381,7 @@ export const Tasks = (props: Props) => {
                         <div className="pr-2">
                             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                                 <DialogTrigger asChild>
-                                    <Button variant="outline" onClick={() => setIsDialogOpen(true)}>Add Task</Button>
+                                    <Button variant="outline" onClick={() => setIsDialogOpen(true)}><Plus/></Button>
                                 </DialogTrigger>
                                 <DialogContent>
                                     <DialogHeader>
@@ -456,7 +457,9 @@ export const Tasks = (props: Props) => {
                                 </DialogContent>
                             </Dialog>
                         </div>
-                        <Button variant="outline" onClick={syncTasksWithTwAndDb}>Sync</Button>
+                        <Button variant="outline" onClick={syncTasksWithTwAndDb}>
+                            <AiOutlineSync fontSize={20}/>
+                        </Button>
 
                     </div>
                 </div>
@@ -581,7 +584,7 @@ export const Tasks = (props: Props) => {
                                                     </DialogContent>
                                                 </Dialog> : null}
 
-                                            {/*Mark task as deleted*/}
+                                                {/*Mark task as deleted*/}
                                                 {task.status != "deleted" ? <Dialog>
                                                     <DialogTrigger>
                                                         <Button variant={"destructive"}>
@@ -616,7 +619,7 @@ export const Tasks = (props: Props) => {
                                 </TableRow>
 
                             ))}
-                            
+
                             {/* Display empty rows */}
                             {emptyRows > 0 && (
                                 <TableRow style={{ height: 52 * emptyRows }}>
