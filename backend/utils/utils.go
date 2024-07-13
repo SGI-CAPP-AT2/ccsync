@@ -1,48 +1,16 @@
-package main
+package utils
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
+	"ccsync_backend/model"
 	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
 	"strings"
-
-	"github.com/google/uuid"
 )
 
-// Task represents a Taskwarrior task
-type Task struct {
-	ID          int32    `json:"id"`
-	Description string   `json:"description"`
-	Project     string   `json:"project"`
-	Tags        []string `json:"tags"`
-	Status      string   `json:"status"`
-	UUID        string   `json:"uuid"`
-	Urgency     float32  `json:"urgency"`
-	Priority    string   `json:"priority"`
-	Due         string   `json:"due"`
-	End         string   `json:"end"`
-	Entry       string   `json:"entry"`
-	Modified    string   `json:"modified"`
-}
-
-// logic to generate client ID for tw config
-func GenerateUUID(email, id string) string {
-	namespace := uuid.NewMD5(uuid.NameSpaceOID, []byte(email+id))
-	return namespace.String()
-}
-
-// logic to generate encryption secret for tw config
-func GenerateEncryptionSecret(uuidStr, email, id string) string {
-	hash := sha256.New()
-	hash.Write([]byte(uuidStr + email + id))
-	return hex.EncodeToString(hash.Sum(nil))
-}
-
 // complete logic (delete config if any->setup config->sync->get tasks->export)
-func FetchTasksFromTaskwarrior(email, encryptionSecret, origin, UUID string) ([]Task, error) {
+func FetchTasksFromTaskwarrior(email, encryptionSecret, origin, UUID string) ([]model.Task, error) {
 	// temporary directory for each user
 	cmd := exec.Command("rm", "-rf", "/root/.task")
 	if err := cmd.Run(); err != nil {
@@ -99,7 +67,7 @@ func SyncTaskwarrior(tempDir string) error {
 }
 
 // export the tasks so as to add them to DB
-func ExportTasks(tempDir string) ([]Task, error) {
+func ExportTasks(tempDir string) ([]model.Task, error) {
 	cmd := exec.Command("task", "export")
 	cmd.Dir = tempDir
 	output, err := cmd.Output()
@@ -108,7 +76,7 @@ func ExportTasks(tempDir string) ([]Task, error) {
 	}
 
 	// Parse the exported tasks
-	var tasks []Task
+	var tasks []model.Task
 	if err := json.Unmarshal(output, &tasks); err != nil {
 		return nil, fmt.Errorf("error parsing tasks: %v", err)
 	}

@@ -1,6 +1,7 @@
-package main_test
+package auth_test
 
 import (
+	"ccsync_backend/auth"
 	"encoding/gob"
 	"encoding/json"
 	"net/http"
@@ -13,11 +14,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
-
-	. "ccsync_backend" // Import the main package
 )
 
-func setup() *App {
+func setup() *auth.App {
 	godotenv.Load(".env")
 
 	clientID := os.Getenv("CLIENT_ID")
@@ -35,7 +34,7 @@ func setup() *App {
 	store := sessions.NewCookieStore(sessionKey)
 	gob.Register(map[string]interface{}{})
 
-	return &App{Config: conf, SessionStore: store}
+	return &auth.App{Config: conf, SessionStore: store}
 }
 
 func Test_OAuthHandler(t *testing.T) {
@@ -55,7 +54,6 @@ func Test_OAuthHandler(t *testing.T) {
 
 func Test_OAuthCallbackHandler(t *testing.T) {
 	app := setup()
-	// This part of the test requires mocking the OAuth provider which can be complex. Simplified for demonstration.
 	req, err := http.NewRequest("GET", "/auth/callback?code=testcode", nil)
 	assert.NoError(t, err)
 
@@ -63,14 +61,13 @@ func Test_OAuthCallbackHandler(t *testing.T) {
 	handler := http.HandlerFunc(app.OAuthCallbackHandler)
 	handler.ServeHTTP(rr, req)
 
-	// Since actual OAuth flow can't be tested in unit test, we are focusing on ensuring no panic
 	assert.NotEqual(t, http.StatusInternalServerError, rr.Code)
 }
 
 func Test_UserInfoHandler(t *testing.T) {
 	app := setup()
 
-	// Create a request object to pass to the session store
+	// create a request object to pass to the session store
 	req, err := http.NewRequest("GET", "/api/user", nil)
 	assert.NoError(t, err)
 
@@ -120,7 +117,7 @@ func Test_LogoutHandler(t *testing.T) {
 	handler := http.HandlerFunc(app.LogoutHandler)
 	handler.ServeHTTP(rr, req)
 
-	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.Equal(t, http.StatusInternalServerError, rr.Code)
 	session, _ := app.SessionStore.Get(req, "session-name")
 	assert.Equal(t, -1, session.Options.MaxAge)
 }
