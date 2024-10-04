@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -129,7 +130,11 @@ func AddTaskToTaskwarrior(email, encryptionSecret, uuid, description, project, p
 	}
 	defer os.RemoveAll(tempDir)
 
-	origin := os.Getenv("CONTAINER_ORIGIN")
+	origin, err := RetrieveSecret("projects/your-project-id/secrets/CONTAINER_ORIGIN/versions/latest")
+	if err != nil {
+		log.Fatalf("Failed to retrieve CONTAINER_ORIGIN: %v", err)
+	}
+
 	if err := SetTaskwarriorConfig(tempDir, encryptionSecret, origin, uuid); err != nil {
 		return err
 	}
@@ -174,7 +179,10 @@ func EditTaskInTaskwarrior(uuid, description, email, encryptionSecret, taskuuid 
 	}
 	defer os.RemoveAll(tempDir)
 
-	origin := os.Getenv("CONTAINER_ORIGIN")
+	origin, err := RetrieveSecret("projects/your-project-id/secrets/CONTAINER_ORIGIN/versions/latest")
+	if err != nil {
+		log.Fatalf("Failed to retrieve CONTAINER_ORIGIN: %v", err)
+	}
 	if err := SetTaskwarriorConfig(tempDir, encryptionSecret, origin, uuid); err != nil {
 		return err
 	}
@@ -209,7 +217,10 @@ func ModifyTaskInTaskwarrior(uuid, description, project, priority, status, due, 
 	}
 	defer os.RemoveAll(tempDir)
 
-	origin := os.Getenv("CONTAINER_ORIGIN")
+	origin, err := RetrieveSecret("projects/your-project-id/secrets/CONTAINER_ORIGIN/versions/latest")
+	if err != nil {
+		log.Fatalf("Failed to retrieve CONTAINER_ORIGIN: %v", err)
+	}
 	if err := SetTaskwarriorConfig(tempDir, encryptionSecret, origin, uuid); err != nil {
 		return err
 	}
@@ -270,7 +281,10 @@ func DeleteTaskInTaskwarrior(email, encryptionSecret, uuid, taskuuid string) err
 	}
 	defer os.RemoveAll(tempDir)
 
-	origin := os.Getenv("CONTAINER_ORIGIN")
+	origin, err := RetrieveSecret("projects/your-project-id/secrets/CONTAINER_ORIGIN/versions/latest")
+	if err != nil {
+		log.Fatalf("Failed to retrieve CONTAINER_ORIGIN: %v", err)
+	}
 	if err := SetTaskwarriorConfig(tempDir, encryptionSecret, origin, uuid); err != nil {
 		return err
 	}
@@ -305,7 +319,10 @@ func CompleteTaskInTaskwarrior(email, encryptionSecret, uuid, taskuuid string) e
 	}
 	defer os.RemoveAll(tempDir)
 
-	origin := os.Getenv("CONTAINER_ORIGIN")
+	origin, err := RetrieveSecret("projects/your-project-id/secrets/CONTAINER_ORIGIN/versions/latest")
+	if err != nil {
+		log.Fatalf("Failed to retrieve CONTAINER_ORIGIN: %v", err)
+	}
 	if err := SetTaskwarriorConfig(tempDir, encryptionSecret, origin, uuid); err != nil {
 		return err
 	}
